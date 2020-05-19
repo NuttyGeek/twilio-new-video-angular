@@ -25,6 +25,8 @@ export class TwilioService {
   }
 
   connectToRoom(accessToken: string, options): void {
+    console.log(':: accessToken', accessToken);
+    console.log(':: options', options);
     connect(accessToken, options).then(room => {
       this.roomObj = room;
       if (!this.previewing && options['video']) {
@@ -52,7 +54,7 @@ export class TwilioService {
         // participant.on('trackAdded', track => {
         //   console.log('track added')
         //   this.remoteVideo.nativeElement.appendChild(track.attach());
-        //   // document.getElementById('remote-media-div').appendChild(track.attach());
+        //   document.getElementById('remote-media-div').appendChild(track.attach());
         // });
       });
 
