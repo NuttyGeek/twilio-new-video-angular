@@ -1,0 +1,30 @@
+#video-container {
+  width: 100%;
+}
+
+#remote, #local {
+  width: 240px;
+  height: 240px;
+  margin: 45px auto;
+}
+
+#remote {
+  background-color: blue;
+}
+
+#local {
+  background-color: red;
+}
+
+#remote p, #local p {
+  text-align: center;
+  color: white;
+}
+
+input {
+  display: block;
+  width: 50%;
+  margin: auto;
+  padding: 2px;
+  margin-top: 7px;
+}

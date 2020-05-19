@@ -1,0 +1,22 @@
+<p>
+  {{ message }}
+</p>
+
+<div id="video-container">
+
+  <div id="local" #localVideo>
+    <p>local video</p>
+  </div>
+
+  <div id="remote" #remoteVideo>
+    <p>remote video</p>
+  </div>
+  <input type="text" [(ngModel)]="username" placeholder="username">
+
+  <input type="text" [(ngModel)]="roomName" placeholder="room name">
+
+  <input type="button" [disabled]="!username || !roomName ? true : false" value="connect" (click)="connect()">
+
+  <input type="button" [disabled]="!twilioService.roomObj ? true : false" value="disconnect" (click)="disconnect()">
+
+</div>
