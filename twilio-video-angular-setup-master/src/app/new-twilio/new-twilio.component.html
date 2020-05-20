@@ -1,0 +1,19 @@
+<section>
+  <div id="local" #localVideo>
+    <p>local video</p>
+  </div>
+
+  <div id="remote" #remoteVideo>
+    <p>remote video</p>
+  </div>
+
+  <div>
+    {{message}}
+  </div>
+  <input type="text" [(ngModel)]="usernamevalue" placeholder="username"> <br>
+  <input type="text" [(ngModel)]="roomNameValue" placeholder="roomName"> <br>
+  <br>
+  <button (click)="connect()" [disabled]="twilio.room">Connect</button>
+  <button (click)="disconnect()">Disconnect</button>
+</section>
+

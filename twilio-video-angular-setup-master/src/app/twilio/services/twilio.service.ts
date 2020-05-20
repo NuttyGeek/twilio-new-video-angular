@@ -68,7 +68,7 @@ export class TwilioService {
       // When a Participant removes a Track, detach it from the DOM.
       room.on('trackRemoved', (track, participant) => {
         console.log(participant.identity + " removed track: " + track.kind);
-        this.detachTracks([track]);
+        this.detachTracks(track);
       });
 
       room.once('disconnected',  (room) => {
@@ -79,25 +79,9 @@ export class TwilioService {
           console.log(':: disconnected - participant', participant);
           participant.tracks.forEach((track)=>{
             console.log(':: disconnected - track', track);
+            // this.trackUnsubscribed(track);
           })
         });
-
-        /**
-         *
-         * participant.forEach(function (publication) {
-        console.log("::inside the fe"+publication.track)
-          if (publication.isSubscribed) {
-              const track = publication.track;
-              console.log("::inside the video"+track)
-              this.remoteVideo.nativeElement.appendChild(track.attach());
-          }
-      });
-         */
-
-        // room.localParticipant.tracks.forEach(track => {
-        //   var attachedElements = track.detach();
-        //   attachedElements.forEach(element => element.remove());
-        // });
       });
     });
   }
@@ -107,9 +91,10 @@ export class TwilioService {
     this.remoteVideo.nativeElement.appendChild(track.attach());
   }
 
-  trackUnsubscribed(){
-    console.log(':: track unsubscribed');
-    this.remoteVideo.nativeElement.remove();
+  // when you disconnect the call
+  trackUnsubscribed(track){
+    console.log(':: track unsubscribed', track);
+    track.detach().forEach(element => element.remove());
   }
 
   attachParticipantTracks(participant): void {
@@ -154,15 +139,12 @@ export class TwilioService {
   }
 
   detachTracks(tracks): void {
-    /* tracks.forEach(function (track) {
-      track.detach().forEach(function (detachedElement) {
-        detachedElement.remove();
-      });
-    });
-    */
-    tracks.forEach((participant) => {
-      console.log('Remote Participant connected: ', participant);
-    });
+    if(tracks){
+      tracks.forEach((track)=>{
+        console.log(':: track', track);
+        // track.detach().forEach(element => element.remove());
+      })
+    }
   }
 
 }
