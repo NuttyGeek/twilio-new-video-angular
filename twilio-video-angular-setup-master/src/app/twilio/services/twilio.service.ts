@@ -28,6 +28,7 @@ export class TwilioService {
     console.log(':: accessToken', accessToken);
     console.log(':: options', options);
     connect(accessToken, options).then(room => {
+      console.log(':: room', room);
       this.roomObj = room;
       if (!this.previewing && options['video']) {
         this.startLocalVideo();
@@ -35,33 +36,33 @@ export class TwilioService {
       }
       room.participants.forEach(participant => {
         this.msgSubject.next("Already in Room: '" + participant.identity + "'");
-        // console.log("Already in Room: '" + participant.identity + "'");
-        // this.attachParticipantTracks(participant);
+        console.log("Already in Room: '" + participant.identity + "'");
+        this.attachParticipantTracks(participant);
       });
 
       room.on('participantDisconnected', (participant) => {
         this.msgSubject.next("Participant '" + participant.identity + "' left the room");
-        // console.log("Participant '" + participant.identity + "' left the room");
-
+        console.log("Participant '" + participant.identity + "' left the room");
         this.detachParticipantTracks(participant);
       });
 
       room.on('participantConnected',  (participant) => {
-        participant.tracks.forEach(track => {
-          this.remoteVideo.nativeElement.appendChild(track.attach());
+        console.log(':: added ', participant);
+        participant.on('trackSubscribed', track => this.trackSubscribed(track));
+        participant.on('trackUnsubscribed', this.trackUnsubscribed);
+        participant.tracks.forEach(publication => {
+          if (publication.isSubscribed) {
+            this.trackSubscribed(publication.track);
+          }
         });
-
-        // participant.on('trackAdded', track => {
-        //   console.log('track added')
-        //   this.remoteVideo.nativeElement.appendChild(track.attach());
-        //   document.getElementById('remote-media-div').appendChild(track.attach());
-        // });
       });
+
+
 
       // When a Participant adds a Track, attach it to the DOM.
       room.on('trackAdded', (track, participant) => {
         console.log(participant.identity + " added track: " + track.kind);
-        this.attachTracks([track]);
+        this.attachTracks(track);
       });
 
       // When a Participant removes a Track, detach it from the DOM.
@@ -70,29 +71,73 @@ export class TwilioService {
         this.detachTracks([track]);
       });
 
-      room.once('disconnected',  room => {
+      room.once('disconnected',  (room) => {
         this.msgSubject.next('You left the Room:' + room.name);
-        room.localParticipant.tracks.forEach(track => {
-          var attachedElements = track.detach();
-          attachedElements.forEach(element => element.remove());
+        this.remoteVideo.nativeElement.style.display = 'none';
+        console.log(':: localPartipant ', room.localParticipant);
+        room.participants.forEach((participant) => {
+          console.log(':: disconnected - participant', participant);
+          participant.tracks.forEach((track)=>{
+            console.log(':: disconnected - track', track);
+          })
         });
+
+        /**
+         *
+         * participant.forEach(function (publication) {
+        console.log("::inside the fe"+publication.track)
+          if (publication.isSubscribed) {
+              const track = publication.track;
+              console.log("::inside the video"+track)
+              this.remoteVideo.nativeElement.appendChild(track.attach());
+          }
+      });
+         */
+
+        // room.localParticipant.tracks.forEach(track => {
+        //   var attachedElements = track.detach();
+        //   attachedElements.forEach(element => element.remove());
+        // });
       });
     });
   }
 
-  attachParticipantTracks(participant): void {
-    var tracks = Array.from(participant.tracks.values());
-    this.attachTracks([tracks]);
+  trackSubscribed(track){
+    console.log(':: track subscribed', track);
+    this.remoteVideo.nativeElement.appendChild(track.attach());
   }
 
-  attachTracks(tracks) {
-    tracks.forEach(track => {
-      this.remoteVideo.nativeElement.appendChild(track.attach());
+  trackUnsubscribed(){
+    console.log(':: track unsubscribed');
+    this.remoteVideo.nativeElement.remove();
+  }
+
+  attachParticipantTracks(participant): void {
+   // var tracks = Array.from(participant.tracks.values());
+   participant.on('trackSubscribed', track => this.trackSubscribed(track));
+    this.attachTracks(Array.from(participant.tracks));
+  }
+
+  //:: WORKING
+  attachTracks(tracks: any) {
+    console.log(':: remote tracks', tracks);
+    tracks.forEach((participant) => {
+      console.log('Remote Participant connected: ', participant);
+      participant.forEach(function (publication) {
+        console.log("::inside the fe"+publication.track)
+          if (publication.isSubscribed) {
+              const track = publication.track;
+              console.log("::inside the video"+track)
+              this.remoteVideo.nativeElement.appendChild(track.attach());
+          }
+      });
     });
+
   }
 
   startLocalVideo(): void {
     createLocalVideoTrack().then(track => {
+      console.log(':: local Track', track);
       this.localVideo.nativeElement.appendChild(track.attach());
     });
   }
@@ -109,10 +154,14 @@ export class TwilioService {
   }
 
   detachTracks(tracks): void {
-    tracks.forEach(function (track) {
+    /* tracks.forEach(function (track) {
       track.detach().forEach(function (detachedElement) {
         detachedElement.remove();
       });
+    });
+    */
+    tracks.forEach((participant) => {
+      console.log('Remote Participant connected: ', participant);
     });
   }
 

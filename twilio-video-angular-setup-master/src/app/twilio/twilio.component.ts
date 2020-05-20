@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
-import { Observable } from 'rxjs/Rx';
+import { Observable } from 'rxjs';
 import { TwilioService } from './services/twilio.service';
 // import * as Video from 'twilio-video';;
 
@@ -42,7 +42,7 @@ export class TwilioComponent implements OnInit {
   }
 
   connect(): void {
-    let storage = JSON.parse(localStorage.getItem('token') || '{}');
+    let storage = JSON.parse(sessionStorage.getItem('token') || '{}');
     let date = Date.now();
     if (!this.roomName || !this.username) { this.message = "enter username and room name."; return;}
     if (storage['token'] && storage['created_at'] + 3600000 > date) {
@@ -52,7 +52,7 @@ export class TwilioComponent implements OnInit {
     }
     this.twilioService.getToken(this.username, this.roomName).subscribe(d => {
       this.accessToken = d['token'];
-      localStorage.setItem('token', JSON.stringify({
+      sessionStorage.setItem('token', JSON.stringify({
         token: this.accessToken,
         created_at: date
       }));

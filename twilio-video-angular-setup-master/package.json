@@ -28,7 +28,7 @@
     "express": "^4.17.1",
     "rxjs": "^5.5.6",
     "twilio": "^3.43.1",
-    "twilio-video": "^1.8.0",
+    "twilio-video": "2.3.0",
     "zone.js": "^0.8.19"
   },
   "devDependencies": {
